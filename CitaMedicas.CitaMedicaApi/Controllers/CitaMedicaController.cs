@@ -21,7 +21,7 @@ namespace CitaMedicas.CitaMedicaApi.Controllers
             _correlativoService = correlativoService;            
         }
 
-        [Authorize]
+        //[Authorize]
         [HttpPost()]
         public async Task<IActionResult> RegistrarCitaMedica([FromBody] CitaMedicaRequestDto citaRequest)
         {
@@ -92,7 +92,8 @@ namespace CitaMedicas.CitaMedicaApi.Controllers
             }
         }
 
-        [Authorize]
+
+        //[Authorize]
         [HttpGet]
         public async Task<ActionResult<IEnumerable<CitaMedicaResponseDto>>> ObtenerRecepcionistas()
         {
