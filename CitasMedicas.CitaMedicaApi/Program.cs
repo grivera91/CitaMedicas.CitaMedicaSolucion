@@ -26,12 +26,6 @@ builder.Services.AddCors(options =>
         });
 });
 
-// Configurar cliente HTTP para PayPal
-builder.Services.AddHttpClient("PayPal", client =>
-{
-    client.BaseAddress = new Uri("https://api-m.sandbox.paypal.com/"); // Sandbox para pruebas
-});
-
 // Registrar servicios
 builder.Services.AddScoped<CorrelativoService>();
 
