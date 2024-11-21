@@ -33,21 +33,58 @@ namespace CitaMedicas.CitaMedicaApi.Controllers
             using (var transaction = await _context.Database.BeginTransactionAsync())
             {
                 try
-                {
+                    {
+                    // Validar duplicidad
+                    var citaExistente = await _context.CitasMedicas
+                        .Where(c => c.IdHorario == citaRequest.IdHorario &&
+                                    c.IdMedico == citaRequest.IdMedico &&
+                                    c.IdPaciente == citaRequest.IdPaciente &&
+                                    c.FechaCita.Date == citaRequest.FechaCita.Date)
+                        .FirstOrDefaultAsync();
+
+                    if (citaExistente != null)
+                    {
+                        // Buscar el nombre del paciente
+                        var horario = await _context.Horarios
+                            .Where(p => p.IdHorario == citaRequest.IdHorario)
+                            .Select(p => new { Nombre = p.DescripcionHorario }) // Cambia ContactoEmergencia por el campo correcto de nombre
+                            .FirstOrDefaultAsync();
+
+                        string descripcionHorario = horario?.Nombre ?? "desconocido";
+
+                        return Conflict($"Ya existe una cita registrada para el paciente y el médico seleccionados, en el horario de {descripcionHorario} del día {citaRequest.FechaCita:dd-MM-yyyy}.");
+                    }
+
                     // Generar un nuevo código de cita médica
                     string codigoCitaMedica = await _correlativoService.ObtenerNuevoCorrelativoAsync("CT");
+
+                    // Calcular el impuesto y el importe neto
+                    decimal importeTotal = citaRequest.ImporteTotal;
+                    decimal impuesto = Math.Round(importeTotal * 0.18m, 2); // 18% de IGV (Impuesto General a las Ventas)
+                    decimal importeNeto = Math.Round(importeTotal - impuesto, 2);
+
+                    string codigoTransaccion = Guid.NewGuid().ToString();
 
                     // Crear la nueva cita
                     CitaMedica citaMedica = new CitaMedica
                     {
+                        IdEspecialidad = citaRequest.IdEspecialidad,
                         IdPaciente = citaRequest.IdPaciente,
                         IdMedico = citaRequest.IdMedico,
                         CodigoCitaMedica = codigoCitaMedica,
                         FechaCita = citaRequest.FechaCita,
-                        HoraInicio = citaRequest.HoraInicio,
-                        HoraFin = citaRequest.HoraFin,
+                        IdHorario = citaRequest.IdHorario,
                         MotivoConsulta = citaRequest.MotivoConsulta,
                         EstadoCita = "Pendiente",
+
+                        IdTipoPago = citaRequest.IdTipoPago,
+                        ImporteNeto = importeNeto,
+                        Impuesto = impuesto,
+                        ImporteTotal = citaRequest.ImporteTotal,
+                        FechaPago = DateTime.Now,
+                        Moneda = "PEN",
+                        CodigoTransaccion = codigoTransaccion,
+
                         UsuarioCreacion = citaRequest.UsuarioCreacion,
                         FechaCreacion = DateTime.Now
                     };
@@ -55,30 +92,29 @@ namespace CitaMedicas.CitaMedicaApi.Controllers
                     _context.CitasMedicas.Add(citaMedica);
                     await _context.SaveChangesAsync();
 
-                    // Validación de disponibilidad de horario
-                    //bool horarioDisponible = await _citaMedicaService.ValidarDisponibilidadHorario(nuevaCita);
-                    //if (!horarioDisponible)
-                    //{
-                    //    return Conflict("El horario seleccionado no está disponible.");
-                    //}
-
-                    // Registrar la cita médica
-                    //await _citaMedicaService.RegistrarCitaMedica(citaMedica);
-
                     // Confirmar la transacción
                     await transaction.CommitAsync();
 
                     // Mapear al DTO de respuesta
-                    var citaResponse = new CitaMedicaResponseDto
+                    CitaMedicaResponseDto citaResponse = new CitaMedicaResponseDto
                     {
                         IdCitaMedica = citaMedica.IdCitaMedica,
+                        IdEspecialidad = citaMedica.IdEspecialidad,
                         IdPaciente = citaMedica.IdPaciente,
                         IdMedico = citaMedica.IdMedico,
                         CodigoCitaMedica = citaMedica.CodigoCitaMedica,
                         FechaCita = citaMedica.FechaCita,
-                        HoraInicio = citaMedica.HoraInicio,
-                        HoraFin = citaMedica.HoraFin,
-                        MotivoConsulta = citaMedica.MotivoConsulta
+                        IdHorario = citaMedica.IdHorario,
+                        MotivoConsulta = citaMedica.MotivoConsulta,
+                        EstadoCita = citaMedica.EstadoCita,
+
+                        IdTipoPago = citaMedica.IdTipoPago,
+                        ImporteNeto = citaMedica.ImporteNeto,
+                        Impuesto = citaMedica.ImporteNeto,
+                        ImporteTotal = citaMedica.ImporteNeto,
+                        FechaPago = citaMedica.FechaPago,
+                        Moneda = citaMedica.Moneda,
+                        CodigoTransaccion = citaMedica.CodigoTransaccion,
                     };
 
                     return Ok(citaResponse);
@@ -92,22 +128,22 @@ namespace CitaMedicas.CitaMedicaApi.Controllers
             }
         }
 
-
         //[Authorize]
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<CitaMedicaResponseDto>>> ObtenerRecepcionistas()
+        public async Task<ActionResult<IEnumerable<CitaMedicaResponseDto>>> ObteneCitasMedicas()
         {
             var citasMedicas = await _context.CitasMedicas
                 .Select(m => new CitaMedicaResponseDto
                 {
                     IdCitaMedica = m.IdCitaMedica,
+                    IdEspecialidad = m.IdEspecialidad,
                     IdPaciente = m.IdPaciente,
                     IdMedico = m.IdMedico,
                     CodigoCitaMedica = m.CodigoCitaMedica,
                     FechaCita = m.FechaCita,
-                    HoraInicio = m.HoraInicio,
-                    HoraFin = m.HoraFin,
-                    MotivoConsulta = m.MotivoConsulta
+                    IdHorario = m.IdHorario,
+                    MotivoConsulta = m.MotivoConsulta,
+                    EstadoCita = m.EstadoCita
                 })
                 .ToListAsync();
 

@@ -18,41 +18,31 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAllOrigins",
-        builder =>
+        policy =>
         {
-            builder.AllowAnyOrigin()
-                   .AllowAnyMethod()
-                   .AllowAnyHeader();
+            policy.AllowAnyOrigin()
+                  .AllowAnyMethod()
+                  .AllowAnyHeader();
         });
 });
-/*
-// Configurar Autenticación con JWT
-builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-    .AddJwtBearer(options =>
-    {
-        options.TokenValidationParameters = new TokenValidationParameters
-        {
-            ValidateIssuer = true,
-            ValidateAudience = true,
-            ValidateLifetime = true,
-            ValidateIssuerSigningKey = true,
-            ValidIssuer = builder.Configuration["Jwt:Issuer"], // Configurar el emisor en appsettings.json
-            ValidAudience = builder.Configuration["Jwt:Audience"], // Configurar la audiencia en appsettings.json
-            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"])) // Configurar la clave de firma en appsettings.json
-        };
-    });
-*/
+
+// Configurar cliente HTTP para PayPal
+builder.Services.AddHttpClient("PayPal", client =>
+{
+    client.BaseAddress = new Uri("https://api-m.sandbox.paypal.com/"); // Sandbox para pruebas
+});
+
+// Registrar servicios
 builder.Services.AddScoped<CorrelativoService>();
 
-// Add services to the container.
+// Agregar controladores y Swagger
 builder.Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
+// Configurar el pipeline
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -60,10 +50,8 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-
 app.UseCors("AllowAllOrigins");
-
-//app.UseAuthentication();
+// app.UseAuthentication(); // Descomentar cuando se use autenticación
 app.UseAuthorization();
 
 app.MapControllers();

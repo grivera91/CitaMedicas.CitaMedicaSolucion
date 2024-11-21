@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.9.34728.123
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CitaMedicas.CitaMedicaApi", "CitaMedicas.CitaMedicaApi\CitaMedicas.CitaMedicaApi.csproj", "{19FEED16-52D0-41D9-9498-FA4BC96340EB}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CitasMedicas.CitaMedicaApi", "CitasMedicas.CitaMedicaApi\CitasMedicas.CitaMedicaApi.csproj", "{A48FA06D-6983-49DC-B4AE-4482CD843398}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -11,10 +11,10 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{19FEED16-52D0-41D9-9498-FA4BC96340EB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{19FEED16-52D0-41D9-9498-FA4BC96340EB}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{19FEED16-52D0-41D9-9498-FA4BC96340EB}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{19FEED16-52D0-41D9-9498-FA4BC96340EB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A48FA06D-6983-49DC-B4AE-4482CD843398}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A48FA06D-6983-49DC-B4AE-4482CD843398}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A48FA06D-6983-49DC-B4AE-4482CD843398}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A48FA06D-6983-49DC-B4AE-4482CD843398}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

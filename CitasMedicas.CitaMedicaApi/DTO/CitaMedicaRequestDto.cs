@@ -5,6 +5,9 @@ namespace CitaMedicas.CitaMedicaApi.DTO
     public class CitaMedicaRequestDto
     {
         [Required]
+        public int IdEspecialidad { get; set; }
+
+        [Required]
         public int IdPaciente { get; set; }
 
         [Required]
@@ -14,14 +17,17 @@ namespace CitaMedicas.CitaMedicaApi.DTO
         public DateTime FechaCita { get; set; }
 
         [Required]
-        public TimeSpan HoraInicio { get; set; }
-
-        [Required]
-        public TimeSpan HoraFin { get; set; }
+        public int IdHorario { get; set; }
 
         [Required]
         [MaxLength(255)]
         public string MotivoConsulta { get; set; }
+
+        [Required]
+        public int IdTipoPago { get; set; }
+
+        [Required]
+        public decimal ImporteTotal { get; set; }        
 
         [Required]
         [MaxLength(20)]
